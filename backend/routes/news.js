@@ -44,9 +44,9 @@ function extractImage(item) {
   return match ? match[1] : null;
 }
 
-function isWithinDateRange(dateStr, monthsBack) {
+function isWithinDays(dateStr, daysBack) {
   const cutoff = new Date();
-  cutoff.setMonth(cutoff.getMonth() - monthsBack);
+  cutoff.setDate(cutoff.getDate() - daysBack);
   const date = new Date(dateStr);
   return !isNaN(date) && date >= cutoff && date <= new Date();
 }
@@ -67,7 +67,7 @@ router.get("/", async (req, res) => {
     regions,
     tags,
     keyword,
-    months = "6",
+    days = "180",
     page = "1",
     limit = "20",
   } = req.query;
@@ -75,11 +75,11 @@ router.get("/", async (req, res) => {
   const selectedIndustries = industries ? industries.split(",") : [];
   const selectedRegions = regions ? regions.split(",") : [];
   const selectedTags = tags ? tags.split(",") : [];
-  const monthsBack = Math.min(parseInt(months) || 6, 6);
+  const daysBack = Math.min(parseInt(days) || 180, 180);
   const pageNum = parseInt(page) || 1;
   const limitNum = Math.min(parseInt(limit) || 20, 50);
 
-  const cacheKey = JSON.stringify({ selectedIndustries, selectedRegions, selectedTags, keyword, monthsBack });
+  const cacheKey = JSON.stringify({ selectedIndustries, selectedRegions, selectedTags, keyword, daysBack });
   const cached = cache.get(cacheKey);
   if (cached) {
     return res.json(paginate(cached, pageNum, limitNum));
@@ -101,7 +101,7 @@ router.get("/", async (req, res) => {
   let articles = results.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
 
   // Date filter
-  articles = articles.filter((a) => isWithinDateRange(a.publishedAt, monthsBack));
+  articles = articles.filter((a) => isWithinDays(a.publishedAt, daysBack));
 
   // Tag filter
   if (selectedTags.length > 0) {

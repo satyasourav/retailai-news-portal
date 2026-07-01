@@ -32,6 +32,6 @@ export interface Filters {
   regions: string[];
   tags: string[];
   keyword: string;
-  months: number;
+  days: number;
   companies: string[];
 }

@@ -94,28 +94,28 @@ const feeds = [
     url: "https://retailtechinnovationhub.com/home/feed/",
     source: "Retail Tech Innovation Hub",
     region: "Global",
-    industries: ["Retail", "E-commerce", "Omnichannel", "POS", "Digital Commerce"],
+    industries: ["Retail", "E-commerce", "Omnichannel", "POS", "Digital Commerce", "Agentic Commerce"],
     tags: ["AI", "Technology", "Automation", "Analytics"],
   },
   {
     url: "https://techcrunch.com/tag/retail/feed/",
     source: "TechCrunch",
     region: "Global",
-    industries: ["Retail", "E-commerce", "Digital Commerce"],
+    industries: ["Retail", "E-commerce", "Digital Commerce", "Agentic Commerce", "Agentic AI"],
     tags: ["AI", "Technology", "Startups"],
   },
   {
     url: "https://venturebeat.com/category/ai/feed/",
     source: "VentureBeat",
     region: "Global",
-    industries: ["Retail", "Consumer Products", "Digital Commerce"],
+    industries: ["Retail", "Consumer Products", "Digital Commerce", "Agentic AI"],
     tags: ["AI", "Machine Learning", "Technology"],
   },
   {
     url: "https://www.forbes.com/innovation/feed2/",
     source: "Forbes Innovation",
     region: "Global",
-    industries: ["Retail", "Consumer Products", "E-commerce", "Digital Commerce"],
+    industries: ["Retail", "Consumer Products", "E-commerce", "Digital Commerce", "Agentic AI"],
     tags: ["AI", "Technology", "Analytics"],
   },
   {
@@ -185,6 +185,8 @@ const ALL_INDUSTRIES = [
   "Omnichannel",
   "POS",
   "Digital Commerce",
+  "Agentic Commerce",
+  "Agentic AI",
 ];
 
 const ALL_REGIONS = ["North America", "Europe", "Asia Pacific", "Global"];
@@ -205,7 +207,7 @@ const ALL_TAGS = [
 // Group industries for display in the UI
 const INDUSTRY_GROUPS = {
   "Core": ["Retail", "Consumer Products", "FMCG", "E-commerce", "Supply Chain"],
-  "Capabilities": ["Loyalty", "Omnichannel", "POS", "Digital Commerce"],
+  "Capabilities": ["Loyalty", "Omnichannel", "POS", "Digital Commerce", "Agentic Commerce", "Agentic AI"],
 };
 
 module.exports = { feeds, ALL_INDUSTRIES, ALL_REGIONS, ALL_TAGS, INDUSTRY_GROUPS };

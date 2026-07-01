@@ -7,18 +7,127 @@ interface FilterPanelProps {
   onChange: (filters: Filters) => void;
 }
 
-const MONTH_OPTIONS = [
-  { value: 1, label: "Last 1 month" },
-  { value: 3, label: "Last 3 months" },
-  { value: 6, label: "Last 6 months" },
-];
-
 const REGION_FLAGS: Record<string, string> = {
   "North America": "🇺🇸",
   "Europe": "🇪🇺",
   "Asia Pacific": "🌏",
   "Global": "🌐",
 };
+
+// Slider steps: weekly for first month, monthly thereafter
+const SLIDER_STEPS = [
+  { days: 7,   label: "1w",  group: "week" },
+  { days: 14,  label: "2w",  group: "week" },
+  { days: 21,  label: "3w",  group: "week" },
+  { days: 28,  label: "4w",  group: "week" },
+  { days: 60,  label: "2m",  group: "month" },
+  { days: 90,  label: "3m",  group: "month" },
+  { days: 120, label: "4m",  group: "month" },
+  { days: 150, label: "5m",  group: "month" },
+  { days: 180, label: "6m",  group: "month" },
+];
+
+function daysToStep(days: number): number {
+  const idx = SLIDER_STEPS.findIndex((s) => s.days === days);
+  return idx >= 0 ? idx : SLIDER_STEPS.length - 1;
+}
+
+function DateSlider({ days, onChange }: { days: number; onChange: (d: number) => void }) {
+  const step = daysToStep(days);
+  const pct = (step / (SLIDER_STEPS.length - 1)) * 100;
+  const current = SLIDER_STEPS[step];
+
+  return (
+    <div className="mb-5">
+      <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        Date Range
+      </h3>
+
+      {/* Selected value badge */}
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs text-gray-400">
+          {current.group === "week" ? "Weekly view" : "Monthly view"}
+        </span>
+        <span className="text-xs font-bold text-white bg-accenture-500 px-2.5 py-1 rounded-full shadow-sm">
+          Last {current.label === "1w" ? "1 week"
+            : current.label === "2w" ? "2 weeks"
+            : current.label === "3w" ? "3 weeks"
+            : current.label === "4w" ? "4 weeks"
+            : current.label}
+        </span>
+      </div>
+
+      {/* Slider track */}
+      <div className="relative px-1">
+        <div className="relative">
+          {/* Background track */}
+          <div className="h-1.5 bg-gray-200 rounded-full" />
+          {/* Filled track */}
+          <div
+            className="absolute top-0 left-0 h-1.5 rounded-full bg-gradient-to-r from-accenture-800 to-accenture-500 transition-all duration-150"
+            style={{ width: `${pct}%` }}
+          />
+          {/* Range input (invisible but interactive) */}
+          <input
+            type="range"
+            min={0}
+            max={SLIDER_STEPS.length - 1}
+            step={1}
+            value={step}
+            onChange={(e) => onChange(SLIDER_STEPS[parseInt(e.target.value)].days)}
+            className="absolute inset-0 w-full opacity-0 cursor-pointer h-1.5"
+            style={{ margin: 0 }}
+          />
+          {/* Thumb dot */}
+          <div
+            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-accenture-500 shadow-md shadow-accenture-200 transition-all duration-150 pointer-events-none"
+            style={{ left: `calc(${pct}% - 8px)` }}
+          />
+        </div>
+
+        {/* Tick labels */}
+        <div className="flex justify-between mt-3">
+          {SLIDER_STEPS.map((s, i) => (
+            <button
+              key={s.days}
+              onClick={() => onChange(s.days)}
+              className="flex flex-col items-center gap-0.5 group"
+              style={{ width: `${100 / SLIDER_STEPS.length}%` }}
+            >
+              {/* Tick mark */}
+              <div className={`w-px h-2 rounded-full transition-colors ${
+                i === step ? "bg-accenture-500" : "bg-gray-300 group-hover:bg-accenture-300"
+              }`} />
+              <span className={`text-[9px] font-semibold transition-colors ${
+                i === step
+                  ? "text-accenture-600"
+                  : i < step
+                  ? "text-accenture-300"
+                  : "text-gray-300 group-hover:text-accenture-400"
+              }`}>
+                {s.label}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Week / Month divider label */}
+        <div className="flex mt-1">
+          <div className="flex-none text-[9px] text-gray-300 font-medium" style={{ width: `${(4 / 9) * 100}%` }}>
+            ← weeks
+          </div>
+          <div className="flex-1 text-right text-[9px] text-gray-300 font-medium">
+            months →
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function MultiSelect({
   label,
@@ -89,7 +198,7 @@ export default function FilterPanel({ filters, meta, onChange }: FilterPanelProp
   }
 
   function reset() {
-    onChange({ industries: [], regions: [], tags: [], keyword: "", months: 6, companies: [] });
+    onChange({ industries: [], regions: [], tags: [], keyword: "", days: 180, companies: [] });
   }
 
   const activeCount =
@@ -170,34 +279,11 @@ export default function FilterPanel({ filters, meta, onChange }: FilterPanelProp
           <p className="text-xs text-gray-300 mt-1">e.g. Walmart, Amazon, Unilever</p>
         </div>
 
-        {/* Date range */}
-        <div className="mb-5">
-          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            Date Range
-          </h3>
-          <div className="space-y-1.5">
-            {MONTH_OPTIONS.map((opt) => (
-              <label key={opt.value}
-                className={`flex items-center gap-2.5 cursor-pointer px-3 py-2 rounded-xl border transition-all duration-200 ${
-                  filters.months === opt.value
-                    ? "bg-accenture-50 border-accenture-300 text-accenture-700"
-                    : "border-transparent hover:border-gray-200 text-gray-600"
-                }`}>
-                <input
-                  type="radio"
-                  name="months"
-                  checked={filters.months === opt.value}
-                  onChange={() => onChange({ ...filters, months: opt.value })}
-                  className="accent-accenture-500"
-                />
-                <span className="text-sm font-medium">{opt.label}</span>
-              </label>
-            ))}
-          </div>
-        </div>
+        {/* Date slider */}
+        <DateSlider
+          days={filters.days}
+          onChange={(d) => onChange({ ...filters, days: d })}
+        />
 
         <div className="border-t border-gray-100 pt-4">
           {/* Industry groups */}

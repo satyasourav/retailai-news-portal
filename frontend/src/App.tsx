@@ -9,7 +9,7 @@ const DEFAULT_FILTERS: Filters = {
   regions: [],
   tags: [],
   keyword: "",
-  months: 6,
+  days: 180,
   companies: [],
 };
 
@@ -61,7 +61,7 @@ export default function App() {
         ].filter(Boolean);
         if (terms.length) params.set("keyword", terms.join(" "));
 
-        params.set("months", String(debouncedFilters.months));
+        params.set("days", String(debouncedFilters.days));
         params.set("page", String(p));
         params.set("limit", "20");
 
