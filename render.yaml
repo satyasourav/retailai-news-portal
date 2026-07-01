@@ -2,9 +2,6 @@ services:
   - type: web
     name: retailai-news-portal
     runtime: node
-    buildCommand: >-
-      cd frontend && npm install --include=dev && npm run build &&
-      cd .. && mkdir -p backend/public && cp -r frontend/dist/. backend/public/ &&
-      cd backend && npm install
+    buildCommand: bash build.sh
     startCommand: NODE_ENV=production node backend/server.js
     autoDeploy: true
