@@ -98,8 +98,8 @@ export default function NewsGrid({ data, loading, error, page, onPageChange }: N
                     onClick={() => onPageChange(p)}
                     className={`w-9 h-9 text-sm rounded-lg border transition-colors ${
                       p === page
-                        ? "bg-blue-600 text-white border-blue-600"
-                        : "border-gray-200 hover:bg-gray-50"
+                        ? "bg-accenture-500 text-white border-accenture-500 shadow-sm"
+                        : "border-gray-200 hover:bg-accenture-50 hover:border-accenture-300 hover:text-accenture-600"
                     }`}
                   >
                     {p}
